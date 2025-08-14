@@ -2,27 +2,31 @@ package naukri;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-public class NaukriAutomate {
-
-	public static void main(String[] args) throws InterruptedException {
-
+public class NaukriAutomate extends BaseTest{
+       
+	    @Test
+	    public void test() throws InterruptedException {
 		WebDriverManager.chromedriver().setup();
-		//System.setProperty("webdriver.chrome.driver", "D:\\chromedriver.exe");
-
+		
 		WebDriver driver = new ChromeDriver();
 
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(60));
 		driver.manage().deleteAllCookies();
 		driver.manage().window().maximize();
+		Set<Cookie> s=driver.manage().getCookies();
 
 		String FileName1=System.getProperty("user.dir")+"//src//test//java//resume//Pritam Singh - QA Automation Tester Resume - Latest.pdf";
 		String FileName2=System.getProperty("user.dir")+"//src//test//java//resume//Pritam Singh - QA Automation Tester Resume - Updated.pdf";
@@ -34,10 +38,12 @@ public class NaukriAutomate {
 		String xViewProfile = "//a[@href='/mnjuser/profile' and contains(text(),'View')]";
 		String xUploadResume = "//input[@id='attachCV']";
 		String xUploadSuccessfull = "//p[@class='msg']";
+		By resumeTitle=By.xpath("//*[contains(@title,'Pritam Singh - QA Automation Tester Resume')]");
 
 		driver.get(url);
 
 		driver.findElement(By.xpath(xLoginButton)).click();
+
 		driver.findElement(By.xpath(xUserName)).sendKeys("singh.pritam2503@gmail.com");
 		;
 		driver.findElement(By.xpath(xPassword)).sendKeys("Kingkong@007007");
@@ -62,18 +68,28 @@ public class NaukriAutomate {
 
 		driver.findElement(By.xpath(xViewProfile)).click();
 		driver.navigate().refresh();
+		
+		Assert.assertTrue(false);
+
 		Thread.sleep(1500);
 
 		for (int i = 1; i <= 96; i++) {
 
 			try {
+				
 
-				String resume = GetDynamicFileName.getFilePaths(FileName1, FileName2); // class
+				//String resume = GetDynamicFileName.getFilePaths(FileName1, FileName2); // class
 																						// name
-																						// =
+				String resume=null;																	// =
 																						// "getDynamicFileName"
-
-				driver.findElement(By.xpath(xUploadResume)).sendKeys(resume);
+                if(driver.findElement(resumeTitle).getText().contains("Latest")){
+                	driver.findElement(By.xpath(xUploadResume)).sendKeys(FileName2);
+                	resume=FileName2;
+                }
+                else{
+                	driver.findElement(By.xpath(xUploadResume)).sendKeys(FileName1);
+                	resume=FileName1;
+                }
 				// Resume has been successfully uploaded.
 				wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(xUploadSuccessfull))));
 
@@ -84,7 +100,7 @@ public class NaukriAutomate {
 					System.out.println("Resume '" + i + "' uploaded at " + time + " => " + resume);
 				}
 
-				long resumeUploadFrequencyInMinutes = 20; // Please choose
+				long resumeUploadFrequencyInMinutes = 2; // Please choose
 															// the frequency
 															// of uploading
 															// the your
@@ -92,6 +108,7 @@ public class NaukriAutomate {
 															// "Minutes"
 
 				Thread.sleep((resumeUploadFrequencyInMinutes * 60000) - 1050);
+                
 			} catch (org.openqa.selenium.WebDriverException e) {
 				System.out.println(e.getMessage());
 			}
