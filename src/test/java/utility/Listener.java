@@ -8,7 +8,7 @@ import java.io.File;
 public class Listener implements ITestListener {
 
     public void onStart(ITestContext context) {
-    	File resultsDir = new File("./allure-results");
+    	File resultsDir = new File(System.getProperty("user.dir"), "allure-results");
         if (resultsDir.exists() && resultsDir.isDirectory()) {
             File[] files = resultsDir.listFiles();
             if (files != null) {
